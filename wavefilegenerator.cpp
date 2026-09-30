@@ -4,6 +4,7 @@
 // include fixed-width integer types
 // wav files require fixed-width integer types for proper header formatting
 #include <cstdint>
+#include <cstring> // for memcpy
 
 // forces no additional padding
 #pragma pack(push, 1)
@@ -12,6 +13,8 @@
 // each field needs an explicit type declaration (eg uint32_t for 4-byte unsigned integer)
 // you're defining a type (blueprint) not a value (a bit like a JS class)
 struct WavHeader {
+    // possible to assign here during declaration, e.g.
+    // char riff[4] = {'R', 'I', 'F', 'F'};
     char riff[4];
     uint32_t chunkSize;
     char wave[4];
@@ -45,6 +48,26 @@ int main() {
     // we don't want this as the written wav would not match the expected header size
     // hence we use #pragma pack (above) to force no additional padding
     std::cout << sizeof(WavHeader) << "\n"; // 44 - but see above note
+
+    // exit code - 0 means successful execution
     return 0;
+
+    //declares a variable named header of type WavHeader
+    WavHeader header;
+
+    // memcopy (memory copy) copies a block of memory from one location to another
+    // means we don't need to set each character individually
+    // e.g. header.riff[0] = 'R'; etc
+    // memcpy(destination, source, howManyBytes)
+    memcpy(header.riff, "RIFF", 4);
+    memcpy(header.wave, "WAVE", 4);
+    memcpy(header.fmt, "fmt ", 4);
+    header.audioFormat = 1; // PCM format
+    header.numChannels = 1; // mono
+    header.sampleRate = 44100;
+    header.bitsPerSample = 16;
+    // remaining fields are calculated from other values
+
+
 }
 

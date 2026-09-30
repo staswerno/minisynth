@@ -1,5 +1,7 @@
 # README
 
+an uncommented version of the code is available in ./clean
+
 ## commands
 
 ### run test
