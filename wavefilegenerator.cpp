@@ -5,15 +5,46 @@
 // wav files require fixed-width integer types for proper header formatting
 #include <cstdint>
 
+// forces no additional padding
+#pragma pack(push, 1)
+// struct is similar to grouping related data into an object in JS
+// it bundles multiple named fields together into one custom type
+// each field needs an explicit type declaration (eg uint32_t for 4-byte unsigned integer)
+// you're defining a type (blueprint) not a value (a bit like a JS class)
+struct WavHeader {
+    char riff[4];
+    uint32_t chunkSize;
+    char wave[4];
+    char fmt [4];
+    uint32_t subchunk1Size;
+    uint16_t audioFormat;
+    uint16_t numChannels;
+    uint32_t sampleRate;
+    uint32_t byteRate;
+    uint16_t blockAlign;
+    uint16_t bitsPerSample;
+    char data[4];
+    uint32_t subchunk2Size;
+};
+// returns padding packing to default behaviour
+#pragma pack(pop)
+
 // every c++ program needs exactly one main function
 int main() {
     // uint = unsigned integer to represent only non-negative values (0-255 ∴ 256)
     // output of uint32_t = 4 (size of int in bytes) - in this instance guaranteed, unlike "int"
     // note: byte-width tells you how much space something takes, but not what it means
-    std::cout << sizeof(int) << "\n";
-    std::cout << sizeof(uint32_t) << "\n";
-    std::cout << sizeof(uint16_t) << "\n";
-    std::cout << sizeof(uint8_t) << "\n";
+    std::cout << sizeof(int) << "\n"; // 4
+    std::cout << sizeof(uint32_t) << "\n"; // 4
+    std::cout << sizeof(uint16_t) << "\n"; // 2
+    std::cout << sizeof(uint8_t) << "\n"; // 1
+
+    // this actually outputs 44 "by luck of field ordering" (see README)
+    // BUT sometimes compilers add padding bytes for performance reasons
+    // (aligning data to certain memory boundaries makes CPUs faster at reading it)
+    // we don't want this as the written wav would not match the expected header size
+    // hence we use #pragma pack (above) to force no additional padding
+    std::cout << sizeof(WavHeader) << "\n"; // 44 - but see above note
     return 0;
 }
 
