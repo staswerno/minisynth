@@ -2,6 +2,7 @@
 
 ### run test
 
-`g++ test.cpp -o test && ./test`
-compile test.cpp, and name the output binary test (the -o flag means "output")
-&& will run ./test if the preceeding command succeeds
+`g++ test.cpp -o test && ./test` <br>
+compiles `test.cpp`, and names the output binary "test" <br>
+the `-o` flag means "output" <br>
+`&&` will run `./test` if the preceeding command succeeds
