@@ -1,6 +1,7 @@
 # README
 
 the primary program file is `wavefilegenerator.cpp`
+
 an uncommented version of the code is available in ./clean
 
 ## commands
