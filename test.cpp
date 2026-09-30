@@ -8,7 +8,7 @@ int main() {
     // character output = console printing tool
     // std = standard namespace. cout lives here
     // << is the stream insertion operator used to send data to the output stream
-    std::cout << "hello";
+    std::cout << "hello, world!";
     // exit code - 0 means successful execution
     return 0;
 }
