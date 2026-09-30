@@ -21,13 +21,6 @@ struct WavHeader {
 #pragma pack(pop)
 
 int main() {
-    std::cout << sizeof(int) << "\n";
-    std::cout << sizeof(uint32_t) << "\n";
-    std::cout << sizeof(uint16_t) << "\n";
-    std::cout << sizeof(uint8_t) << "\n";
-    std::cout << sizeof(WavHeader) << "\n";
-    return 0;
-
     WavHeader header;
 
     memcpy(header.riff, "RIFF", 4);
