@@ -1,0 +1,14 @@
+// points to correct compiler for Mac development environment
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": ["${workspaceFolder}/**"],
+            "compilerPath": "/usr/bin/clang++",
+            "compilerArgs": ["-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk"],
+            "cppStandard": "c++17",
+            "intelliSenseMode": "macos-clang-arm64"
+        }
+    ],
+    "version": 4
+}
