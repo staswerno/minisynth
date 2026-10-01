@@ -5,6 +5,8 @@
 // wav files require fixed-width integer types for proper header formatting
 #include <cstdint>
 #include <cstring> // for memcpy
+#include <vector> // for dynamic arrays (used for audio data)
+#include <cmath> // for mathematical functions (used for generating audio samples)
 
 // forces no additional padding
 #pragma pack(push, 1)
@@ -34,6 +36,10 @@ struct WavHeader {
 
 // every c++ program needs exactly one main function
 int main() {
+
+    // double is a more precise (uses 64 bits) version of float
+    const double PI = 3.14159265358979323846;
+
     // uint = unsigned integer to represent only non-negative values (0-255 ∴ 256)
     // output of uint32_t = 4 (size of int in bytes) - in this instance guaranteed, unlike "int"
     // note: byte-width tells you how much space something takes, but not what it means
@@ -79,8 +85,22 @@ int main() {
     std::cout << "header.subchunk2Size: " << header.subchunk2Size << "\n";
     std::cout << "header.chunkSize: " << header.chunkSize << "\n";  
 
-    
+    // whenever a value scales with user input (duration, sample rate, file length, etc.)
+    // default to a 32-bit type, unless you have a specific reason to go smaller
+    uint32_t numSamples = header.sampleRate * durationSeconds; // total number of audio samples - 132,300
+    std::vector<int16_t> samples(numSamples); // allocate 132,300 zero-initialized spaces for all audio samples, each a int16_t value
+
+    // because freq and amp are internal calculations, not written to the file, they can be regular int types
+    int frequency = 528;
+    int amplitude = 10000;
+
+    // explicitly type i, rather than "let" as in js
+    for (uint32_t i = 0; i < numSamples; i++) {
+        // static_cast converts double (decimal) value to samples[i]'s int16_t value
+        // it basically chops off the decimal (not rounding)
+        samples[i] = static_cast<int16_t>(amplitude * sin(2 * PI * frequency * i / header.sampleRate)); // sine wave formula
+    }
+
     // exit code - 0 means successful execution
     return 0;
 }
-

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdint>
 #include <cstring>
+#include <vector>
+#include <cmath>
 
 #pragma pack(push, 1)
 struct WavHeader {
@@ -21,8 +23,10 @@ struct WavHeader {
 #pragma pack(pop)
 
 int main() {
-    WavHeader header;
+    const double PI = 3.14159265358979323846;
     float durationSeconds = 3;
+
+    WavHeader header;
 
     memcpy(header.riff, "RIFF", 4);
     memcpy(header.wave, "WAVE", 4);
@@ -38,5 +42,14 @@ int main() {
     header.subchunk2Size = header.byteRate * durationSeconds;
     header.chunkSize = 44 + header.subchunk2Size - 8;
 
-}
+    uint32_t numSamples = header.sampleRate * durationSeconds;
+    std::vector<int16_t> samples(numSamples);
+    int frequency = 528;
+    int amplitude = 10000;
 
+    for (uint32_t i = 0; i < numSamples; i++) {
+        samples[i] = static_cast<int16_t>(amplitude * sin(2 * PI * frequency * i / header.sampleRate));
+    }
+
+    return 0;
+}
