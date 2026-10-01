@@ -2,7 +2,7 @@
 
 the primary program file is `wavefilegenerator.cpp`
 
-an uncommented version of the code is available in ./clean
+an uncommented version of the code is available in `./clean`
 
 ## commands
 
@@ -44,7 +44,7 @@ the `-o` flag means "output" <br>
 | BlockAlign | 2 bytes | uint16_t | bytes per sample-frame |
 | BitsPerSample | 2 bytes | uint16_t | e.g. 16 |
 | "data" | 4 bytes | char[4] | marker for the audio data section |
-| Subchunk2Size | 4 bytes | uint32_t | size of the actual audio data that follows |
+| Subchunk2Size | 4 bytes | uint32_t | size of the actual audio data |
 
 ### notes on WavHeader byte size output
 

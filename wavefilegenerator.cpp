@@ -37,20 +37,20 @@ int main() {
     // uint = unsigned integer to represent only non-negative values (0-255 ∴ 256)
     // output of uint32_t = 4 (size of int in bytes) - in this instance guaranteed, unlike "int"
     // note: byte-width tells you how much space something takes, but not what it means
-    std::cout << sizeof(int) << "\n"; // 4
-    std::cout << sizeof(uint32_t) << "\n"; // 4
-    std::cout << sizeof(uint16_t) << "\n"; // 2
-    std::cout << sizeof(uint8_t) << "\n"; // 1
+    std::cout << "size of int: " << sizeof(int) << "\n"; // 4
+    std::cout << "size of uint32_t: " << sizeof(uint32_t) << "\n"; // 4
+    std::cout << "size of uint16_t: " << sizeof(uint16_t) << "\n"; // 2
+    std::cout << "size of uint8_t: " << sizeof(uint8_t) << "\n"; // 1
 
     // this actually outputs 44 "by luck of field ordering" (see README)
     // BUT sometimes compilers add padding bytes for performance reasons
     // (aligning data to certain memory boundaries makes CPUs faster at reading it)
     // we don't want this as the written wav would not match the expected header size
     // hence we use #pragma pack (above) to force no additional padding
-    std::cout << sizeof(WavHeader) << "\n"; // 44 - but see above note
+    std::cout << "size of WavHeader: " << sizeof(WavHeader) << "\n"; // 44 - but see above note
 
-    // exit code - 0 means successful execution
-    return 0;
+    // declare wav duration in seconds
+    float durationSeconds = 3;
 
     //declares a variable named header of type WavHeader
     WavHeader header;
@@ -62,12 +62,25 @@ int main() {
     memcpy(header.riff, "RIFF", 4);
     memcpy(header.wave, "WAVE", 4);
     memcpy(header.fmt, "fmt ", 4);
+    memcpy(header.data, "data", 4);
+    header.subchunk1Size = 16; // PCM header size
     header.audioFormat = 1; // PCM format
     header.numChannels = 1; // mono
     header.sampleRate = 44100;
     header.bitsPerSample = 16;
-    // remaining fields are calculated from other values
+    header.blockAlign = (header.bitsPerSample / 8) * header.numChannels; // bytes per sample-frame
+    header.byteRate = header.blockAlign * header.sampleRate; // bytes played per second
+    header.subchunk2Size = header.byteRate * durationSeconds; // size of the audio data
+    header.chunkSize = 44 + header.subchunk2Size - 8; // total file size - 8 bytes for "RIFF" and chunkSize fields
 
+    // verify header values
+    std::cout << "header.blockAlign: " << header.blockAlign << "\n";
+    std::cout << "header.byteRate: " << header.byteRate << "\n";
+    std::cout << "header.subchunk2Size: " << header.subchunk2Size << "\n";
+    std::cout << "header.chunkSize: " << header.chunkSize << "\n";  
 
+    
+    // exit code - 0 means successful execution
+    return 0;
 }
 

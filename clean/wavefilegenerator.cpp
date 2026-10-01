@@ -22,14 +22,21 @@ struct WavHeader {
 
 int main() {
     WavHeader header;
+    float durationSeconds = 3;
 
     memcpy(header.riff, "RIFF", 4);
     memcpy(header.wave, "WAVE", 4);
     memcpy(header.fmt, "fmt ", 4);
-    header.audioFormat = 1; // PCM format
-    header.numChannels = 1; // mono
+    memcpy(header.data, "data", 4);
+    header.subchunk1Size = 16;
+    header.audioFormat = 1;
+    header.numChannels = 1;
     header.sampleRate = 44100;
     header.bitsPerSample = 16;
+    header.blockAlign = (header.bitsPerSample / 8) * header.numChannels;
+    header.byteRate = header.blockAlign * header.sampleRate;
+    header.subchunk2Size = header.byteRate * durationSeconds;
+    header.chunkSize = 44 + header.subchunk2Size - 8;
 
 }
 
