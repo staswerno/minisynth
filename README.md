@@ -17,6 +17,14 @@ the `-o` flag means "output" <br>
 
 `g++ wavefilegenerator.cpp -o wavefilegenerator && ./wavefilegenerator`
 
+### run wave file generator (clean)
+
+`g++ clean/wavefilegenerator-clean.cpp -o clean/wavefilegenerator-clean && ./clean/wavefilegenerator-clean`
+
+### check generated file size
+
+`ls -la tone.wav`
+
 ## notes
 
 ### wav files

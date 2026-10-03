@@ -7,6 +7,7 @@
 #include <cstring> // for memcpy
 #include <vector> // for dynamic arrays (used for audio data)
 #include <cmath> // for mathematical functions (used for generating audio samples)
+#include <fstream> // for file input/output (used to write the wav file)
 
 // forces no additional padding
 #pragma pack(push, 1)
@@ -37,13 +38,11 @@ struct WavHeader {
 // every c++ program needs exactly one main function
 int main() {
 
-    // double is a more precise (uses 64 bits) version of float
-    const double PI = 3.14159265358979323846;
-
-    // uint = unsigned integer to represent only non-negative values (0-255 ∴ 256)
+    // unsigned = no sign bit, so no negative values — just 0 and up
+    // range depends on bit-width (e.g. uint8_t: 0-255, uint16_t: 0-65535)
     // output of uint32_t = 4 (size of int in bytes) - in this instance guaranteed, unlike "int"
     // note: byte-width tells you how much space something takes, but not what it means
-    std::cout << "size of int: " << sizeof(int) << "\n"; // 4
+    std::cout << "size of int: " << sizeof(int) << "\n"; // 4 - but not fixed
     std::cout << "size of uint32_t: " << sizeof(uint32_t) << "\n"; // 4
     std::cout << "size of uint16_t: " << sizeof(uint16_t) << "\n"; // 2
     std::cout << "size of uint8_t: " << sizeof(uint8_t) << "\n"; // 1
@@ -52,11 +51,13 @@ int main() {
     // BUT sometimes compilers add padding bytes for performance reasons
     // (aligning data to certain memory boundaries makes CPUs faster at reading it)
     // we don't want this as the written wav would not match the expected header size
-    // hence we use #pragma pack (above) to force no additional padding
+    // hence we use the #pragma pack (above) to force no additional padding
     std::cout << "size of WavHeader: " << sizeof(WavHeader) << "\n"; // 44 - but see above note
 
     // declare wav duration in seconds
     float durationSeconds = 3;
+
+    const double PI = 3.14159265358979323846;
 
     //declares a variable named header of type WavHeader
     WavHeader header;
@@ -77,13 +78,13 @@ int main() {
     header.blockAlign = (header.bitsPerSample / 8) * header.numChannels; // bytes per sample-frame
     header.byteRate = header.blockAlign * header.sampleRate; // bytes played per second
     header.subchunk2Size = header.byteRate * durationSeconds; // size of the audio data
-    header.chunkSize = 44 + header.subchunk2Size - 8; // total file size - 8 bytes for "RIFF" and chunkSize fields
+    header.chunkSize = sizeof(header) + header.subchunk2Size - 8; // total file size - 8 bytes for "RIFF" and chunkSize fields
 
     // verify header values
-    std::cout << "header.blockAlign: " << header.blockAlign << "\n";
-    std::cout << "header.byteRate: " << header.byteRate << "\n";
-    std::cout << "header.subchunk2Size: " << header.subchunk2Size << "\n";
-    std::cout << "header.chunkSize: " << header.chunkSize << "\n";  
+    std::cout << "blockAlign: " << header.blockAlign << "\n";
+    std::cout << "byteRate: " << header.byteRate << "\n";
+    std::cout << "subchunk2Size: " << header.subchunk2Size << "\n";
+    std::cout << "chunkSize: " << header.chunkSize << "\n";  
 
     // whenever a value scales with user input (duration, sample rate, file length, etc.)
     // default to a 32-bit type, unless you have a specific reason to go smaller
@@ -91,15 +92,27 @@ int main() {
     std::vector<int16_t> samples(numSamples); // allocate 132,300 zero-initialized spaces for all audio samples, each a int16_t value
 
     // because freq and amp are internal calculations, not written to the file, they can be regular int types
-    int frequency = 528;
-    int amplitude = 10000;
+    int frequency = 528; // Hz
+    int amplitude = 10000; // peak amplitude, must stay within int16_t range (±32767)
 
     // explicitly type i, rather than "let" as in js
     for (uint32_t i = 0; i < numSamples; i++) {
         // static_cast converts double (decimal) value to samples[i]'s int16_t value
         // it basically chops off the decimal (not rounding)
-        samples[i] = static_cast<int16_t>(amplitude * sin(2 * PI * frequency * i / header.sampleRate)); // sine wave formula
+        samples[i] = static_cast<int16_t>(amplitude * sin(2 * PI * frequency * i / header.sampleRate)); // sine wave formula, generates a value between -amplitude and +amplitude
+        // print the first 20 samples for verification (and out of pure curiosity)
+        if (i < 20) {
+            std::cout << samples[i] << "\n";
+        }
     }
+
+    std::ofstream file("tone.wav", std::ios::binary); // binary writes raw bytes - no text-mode transformations
+    // &header is WavHeader's memory address
+    // char* relabels address as "pointing to raw bytes" (what write() requires)
+    // think of char* a "byte type" (confusing, historical artifact)
+    file.write(reinterpret_cast<const char*>(&header), sizeof(header)); // writes the header
+    file.write(reinterpret_cast<const char*>(samples.data()), header.subchunk2Size); // writes the audio data
+    file.close();
 
     // exit code - 0 means successful execution
     return 0;
