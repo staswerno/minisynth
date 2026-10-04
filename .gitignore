@@ -1,0 +1,11 @@
+# compiled binaries
+/minisynth
+/clean/minisynth-clean
+*.o
+*.dSYM/
+
+# generated audio
+*.wav
+
+# macOS
+.DS_Store

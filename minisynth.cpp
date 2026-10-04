@@ -42,7 +42,7 @@ int main() {
     header.blockAlign = (header.bitsPerSample / 8) * header.numChannels; // bytes per sample-frame
     header.byteRate = header.blockAlign * header.sampleRate; // bytes played per second
     header.subchunk2Size = header.byteRate * durationSeconds; // size of the audio data
-    header.chunkSize = sizeof(header) + header.subchunk2Size - 8; // total file size
+    header.chunkSize = sizeof(header) + header.subchunk2Size - 8; // total file size minus 8 bytes for "RIFF" and chunkSize fields
 
     uint32_t numSamples = header.sampleRate * durationSeconds;
     std::vector<int16_t> samples(numSamples);
