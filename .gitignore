@@ -5,7 +5,7 @@
 *.dSYM/
 
 # generated audio
-*.wav
+/*.wav
 
 # macOS
 .DS_Store
