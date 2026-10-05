@@ -4,8 +4,10 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
+#include <string>
 
 #pragma pack(push, 1)
+// remember, this is a type definition, not a value
 struct WavHeader {
     char riff[4];
     uint32_t chunkSize;
@@ -23,11 +25,11 @@ struct WavHeader {
 };
 #pragma pack(pop)
 
-int main() {
-
-    float durationSeconds = 3; //seconds
-    const double PI = 3.14159265358979323846;
-
+// there is no hoisting in C++, code is read from top to bottom, so functions must be defined above the code that calls them
+// function definition leads with the return type - in this case the return type is WavHeader
+// the compiler checks every return in the function against this promised return type
+// creates a WavHeader variable based on previously defined type WavHeader, and fills in its fields
+WavHeader createWavHeader(float durationSeconds) {
     WavHeader header;
 
     memcpy(header.riff, "RIFF", 4);
@@ -44,19 +46,48 @@ int main() {
     header.subchunk2Size = header.byteRate * durationSeconds; // size of the audio data
     header.chunkSize = sizeof(header) + header.subchunk2Size - 8; // total file size minus 8 bytes for "RIFF" and chunkSize fields
 
-    uint32_t numSamples = header.sampleRate * durationSeconds;
+    return header;
+}
+
+// calculates the sample values of a sine tone
+std::vector<int16_t> generateTone(float durationSeconds, uint32_t sampleRate, int frequency, int amplitude) {
+    const double PI = 3.14159265358979323846;
+
+    uint32_t numSamples = sampleRate * durationSeconds;
     std::vector<int16_t> samples(numSamples);
-    int frequency = 528; // Hz
-    int amplitude = 10000; // peak amplitude, must stay within int16_t range (±32767)
 
     for (uint32_t i = 0; i < numSamples; i++) {
-        samples[i] = static_cast<int16_t>(amplitude * sin(2 * PI * frequency * i / header.sampleRate)); // sine wave formula
+        samples[i] = static_cast<int16_t>(amplitude * sin(2 * PI * frequency * i / sampleRate)); // sine wave formula
     }
 
-    std::ofstream file("tone.wav", std::ios::binary);
+    return samples;
+}
+
+// writes the WAV header and the audio data to a file. returns nothing
+void writeFile(WavHeader header, std::vector<int16_t> samples, std::string outputPath) {
+
+    std::ofstream file(outputPath, std::ios::binary);
     file.write(reinterpret_cast<const char*>(&header), sizeof(header));
     file.write(reinterpret_cast<const char*>(samples.data()), header.subchunk2Size);
     file.close();
+}
+
+// program starts here
+// holds our "choices" (frequency, amplitude etc)
+// runs the functions (passing values between them) necessary for the desired result of the program.
+int main() {
+    float durationSeconds = 3; //seconds
+    int frequency = 528; // Hz
+    int amplitude = 10000; // peak amplitude, must stay within int16_t range (±32767)
+    std::string outputPath = "tone.wav";
+
+    // writing the type in a function call would turn it into a declaration, hence no type
+    // durationSeconds: we are using an existing variable, hence no type declaration
+    // createWavHeader returns the *value* of its own "header" variable (which then disappears),
+    // and we store it in a NEW "header" variable here
+    WavHeader header = createWavHeader(durationSeconds);
+    std::vector<int16_t> samples = generateTone(durationSeconds, header.sampleRate, frequency, amplitude);
+    writeFile(header, samples, outputPath);
 
     return 0;
 }

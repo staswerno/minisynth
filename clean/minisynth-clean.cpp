@@ -4,6 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
+#include <string>
 
 #pragma pack(push, 1)
 struct WavHeader {
@@ -23,11 +24,7 @@ struct WavHeader {
 };
 #pragma pack(pop)
 
-int main() {
-
-    float durationSeconds = 3; //seconds
-    const double PI = 3.14159265358979323846;
-
+WavHeader createWavHeader(float durationSeconds) {
     WavHeader header;
 
     memcpy(header.riff, "RIFF", 4);
@@ -44,19 +41,39 @@ int main() {
     header.subchunk2Size = header.byteRate * durationSeconds; // size of the audio data
     header.chunkSize = sizeof(header) + header.subchunk2Size - 8; // total file size minus 8 bytes for "RIFF" and chunkSize fields
 
-    uint32_t numSamples = header.sampleRate * durationSeconds;
+    return header;
+}
+
+std::vector<int16_t> generateTone(float durationSeconds, uint32_t sampleRate, int frequency, int amplitude) {
+    const double PI = 3.14159265358979323846;
+
+    uint32_t numSamples = sampleRate * durationSeconds;
     std::vector<int16_t> samples(numSamples);
-    int frequency = 528; // Hz
-    int amplitude = 10000; // peak amplitude, must stay within int16_t range (±32767)
 
     for (uint32_t i = 0; i < numSamples; i++) {
-        samples[i] = static_cast<int16_t>(amplitude * sin(2 * PI * frequency * i / header.sampleRate)); // sine wave formula
+        samples[i] = static_cast<int16_t>(amplitude * sin(2 * PI * frequency * i / sampleRate)); // sine wave formula
     }
 
-    std::ofstream file("tone.wav", std::ios::binary);
+    return samples;
+}
+
+void writeFile(WavHeader header, std::vector<int16_t> samples, std::string outputPath) {
+
+    std::ofstream file(outputPath, std::ios::binary);
     file.write(reinterpret_cast<const char*>(&header), sizeof(header));
     file.write(reinterpret_cast<const char*>(samples.data()), header.subchunk2Size);
     file.close();
+}
+
+int main() {
+    float durationSeconds = 3; //seconds
+    int frequency = 528; // Hz
+    int amplitude = 10000; // peak amplitude, must stay within int16_t range (±32767)
+    std::string outputPath = "tone.wav";
+
+    WavHeader header = createWavHeader(durationSeconds);
+    std::vector<int16_t> samples = generateTone(durationSeconds, header.sampleRate, frequency, amplitude);
+    writeFile(header, samples, outputPath);
 
     return 0;
 }
