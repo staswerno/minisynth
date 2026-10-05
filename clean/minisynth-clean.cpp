@@ -58,7 +58,6 @@ std::vector<int16_t> generateTone(float durationSeconds, uint32_t sampleRate, in
 }
 
 void writeFile(WavHeader header, std::vector<int16_t> samples, std::string outputPath) {
-
     std::ofstream file(outputPath, std::ios::binary);
     file.write(reinterpret_cast<const char*>(&header), sizeof(header));
     file.write(reinterpret_cast<const char*>(samples.data()), header.subchunk2Size);
