@@ -41,7 +41,7 @@ an uncommented version of the code is available in `./clean`
 
 ### run pass-by-value experiment
 
-`clang++ pass-by-value.cpp -std=c++17 -Wall -Wextra -o pass-by-value && ./pass-by-value`
+`clang++ pass-by-value-vs-reference.cpp -std=c++17 -Wall -Wextra -o pass-by-value-vs-reference && ./pass-by-value-vs-reference`
 
 ## notes
 
