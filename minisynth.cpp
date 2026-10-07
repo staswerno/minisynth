@@ -73,7 +73,7 @@ void writeFile(WavHeader header, std::vector<int16_t> samples, std::string outpu
 
 // program starts here
 // holds our "choices" (frequency, amplitude etc)
-// runs the functions (passing values between them) necessary for the desired result of the program.
+// runs the functions (passing values between them) necessary for the desired result of the program
 int main() {
     float durationSeconds = 3; //seconds
     int frequency = 528; // Hz
@@ -82,8 +82,8 @@ int main() {
 
     // writing the type in a function call would turn it into a declaration, hence no type
     // durationSeconds: we are using an existing variable, hence no type declaration
-    // createWavHeader returns the *value* of its own "header" variable (which then disappears),
-    // and we store it in a NEW "header" variable here
+    // createWavHeader() returns the *value* of its own "header" variable (which then disappears),
+    // and we store it in a NEW "header" variable here, for use in the following functions
     WavHeader header = createWavHeader(durationSeconds);
     std::vector<int16_t> samples = generateTone(durationSeconds, header.sampleRate, frequency, amplitude);
     writeFile(header, samples, outputPath);

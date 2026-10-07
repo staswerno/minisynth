@@ -39,5 +39,9 @@ an uncommented version of the code is available in `./clean`
 
 `ls -la tone.wav`
 
+### run pass-by-value experiment
+
+`clang++ pass-by-value.cpp -std=c++17 -Wall -Wextra -o pass-by-value && ./pass-by-value`
+
 ## notes
 

@@ -1,5 +1,6 @@
 # compiled binaries
 /minisynth
+/pass-by-value
 /clean/minisynth-clean
 *.o
 *.dSYM/
