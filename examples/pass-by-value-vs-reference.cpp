@@ -58,6 +58,12 @@ int main () {
 // scale this up with more channels, bits, samples, duration...
 // we're copying and throwing away a lot of data
 
+// note on choosing parameter types:
+// small, simple values (`int`, `float`, `uint32_t`): pass by value
+// copying costs about the same as a reference, and it's simpler
+// bigger things only a function reads: pass by *const* reference (see wav_file.cpp)
+// things the function is meant to change: pass by plain reference
+
 // warning regarding reference: this is not quite the same thing as 
 // the use of &header in writeFile. that is the address of the variable "header"
-// & after a type is a reference
+// & after a type = reference; & before a variable = address

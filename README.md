@@ -16,15 +16,17 @@ build a small synthesizer written in C++ using only the standard library, render
 
 ### file structure
 
-the primary program file is `minisynth.cpp`
-
-an uncommented version of the code is available in `./clean`
+- the primary program file is `minisynth.cpp`
+- `wav_file.cpp` and `wav_file.h` create the WAV file
+- `tone_generator.cpp` and `tone_generator.h` generate the sound samples
+- an uncommented version of this code is available in `./clean`
+- `/examples` contains code that explains relevant concepts
 
 ## commands
 
 ### run minisynth
 
-`clang++ minisynth.cpp -std=c++17 -Wall -Wextra -o minisynth && ./minisynth`
+`clang++ minisynth.cpp wav_file.cpp tone_generator.cpp -std=c++17 -Wall -Wextra -o minisynth && ./minisynth`
 
 - changed `g++` to `clang++` for clarity - on macOS `g++` forwards to Apple clang
 - `-std=c++17` tells the compiler which language version to use when reading the code
@@ -41,7 +43,41 @@ an uncommented version of the code is available in `./clean`
 
 ### run pass-by-value experiment
 
-`clang++ pass-by-value-vs-reference.cpp -std=c++17 -Wall -Wextra -o pass-by-value-vs-reference && ./pass-by-value-vs-reference`
+`clang++ examples/pass-by-value-vs-reference.cpp -std=c++17 -Wall -Wextra -o examples/pass-by-value-vs-reference && ./examples/pass-by-value-vs-reference`
 
 ## notes
 
+### code structure
+
+- there is no hoisting in C++, code is read from top to bottom, so functions must be defined above the code that calls them
+- declarations pasted in at the top of a file make functions known before any code that calls them (see below)
+
+### source and header files
+
+- each .cpp is compiled alone, so the compiler only knows of functions it's seen declarations for
+- #including "headers" pastes in these declarations so the compiler can check even though the code is in other files
+- the linker connects those calls to the definitions in the other object files
+
+- .cpp source files hold the definitions - the code behind the declarations
+- every source .cpp with a header #includes it, so the compiler helps catch mismatches between definitions and declarations
+- if an included header (e.g. `<cstring>`) is only used in a function body in the .cpp file and not in the .h, put it only in the .cpp
+
+- a .h header file is the export list of its header/source pair: types plus declarations, with no function bodies
+- it’s a single source of truth: one copy of the WavHeader struct, so other files can’t disagree about its layout
+- include everything that the function declarations and types use
+- even if a file gets its includes through the included headers, it's good practice to add every include that you need in case there are changes to the other file
+
+### const variable declarations
+
+- const means the value can't be changed
+- any value that doesn't change after the variable is created could be a const
+- eg frequency, amplitude but not samples, i in `generateTone`
+- whether to mark everything possible as const is a style choice
+
+### pass by value and references
+
+- C++ copies arguments by default: the function gets its own copy (pass by value)
+- `&` after a type makes a parameter a reference: no copy, the function works on the caller's original
+- `const &` makes the reference read-only, so you get no copy and no accidental changes
+- small types (`int`, `float`) are fine to pass by value; bigger things the function only reads (vectors, strings, structs) are usually passed by `const &`
+- see `examples/pass-by-value-vs-reference.cpp`
