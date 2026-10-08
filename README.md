@@ -49,7 +49,7 @@ Makefile notes below.
 
 `ls -la tone.wav`
 
-### run pass-by-value experiment
+### run pass-by-value-vs-reference experiment
 
 `clang++ examples/pass-by-value-vs-reference.cpp -std=c++17 -Wall -Wextra -o examples/pass-by-value-vs-reference && ./examples/pass-by-value-vs-reference`
 
@@ -93,8 +93,10 @@ Makefile notes below.
 
 ### Makefile
 
-```greeting: hello.cpp
-	clang++ hello.cpp -o greeting````
+```
+greeting: hello.cpp
+	clang++ hello.cpp -o greeting
+```
 
 - target (greeting): the file this rule produces
 - prerequisites (hello.cpp): the files the target is built from
