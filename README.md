@@ -26,12 +26,20 @@ build a small synthesizer written in C++ using only the standard library, render
 
 ### run minisynth
 
-`clang++ minisynth.cpp wav_file.cpp tone_generator.cpp -std=c++17 -Wall -Wextra -o minisynth && ./minisynth`
+`make`
+
+full command is in Makefile:
+
+`clang++ minisynth.cpp wav_file.cpp tone_generator.cpp -std=c++17 -Wall -Wextra -o minisynth && ./minisynth` 
+
+changes from wavefilegenerator:
 
 - changed `g++` to `clang++` for clarity - on macOS `g++` forwards to Apple clang
 - `-std=c++17` tells the compiler which language version to use when reading the code
 - the `c++17` standard is supported by a wide range of compilers and has required features for project
 - `-Wall` and `-Wextra` enable both common and extra warnings
+
+Makefile notes below. 
 
 ### run minisynth (clean)
 
@@ -63,6 +71,7 @@ build a small synthesizer written in C++ using only the standard library, render
 - if an included header (e.g. `<cstring>`) is only used in a function body in the .cpp file and not in the .h, put it only in the .cpp
 
 - a .h header file is the export list of its header/source pair: types plus declarations, with no function bodies
+- `minisynth.cpp` has no header file, because nothing calls main: a header is only needed for things other files use
 - it’s a single source of truth: one copy of the WavHeader struct, so other files can’t disagree about its layout
 - include everything that the function declarations and types use
 - even if a file gets its includes through the included headers, it's good practice to add every include that you need in case there are changes to the other file
@@ -81,3 +90,14 @@ build a small synthesizer written in C++ using only the standard library, render
 - `const &` makes the reference read-only, so you get no copy and no accidental changes
 - small types (`int`, `float`) are fine to pass by value; bigger things the function only reads (vectors, strings, structs) are usually passed by `const &`
 - see `examples/pass-by-value-vs-reference.cpp`
+
+### Makefile
+
+```greeting: hello.cpp
+	clang++ hello.cpp -o greeting````
+
+- target (greeting): the file this rule produces
+- prerequisites (hello.cpp): the files the target is built from
+- recipe (the indented line): the command that builds it
+
+"to make greeting, you need hello.cpp, and here’s the command"
