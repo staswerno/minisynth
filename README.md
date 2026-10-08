@@ -26,7 +26,7 @@ build a small synthesizer written in C++ using only the standard library, render
 
 ### run minisynth
 
-`make`
+`make run`
 
 full command is in Makefile:
 
