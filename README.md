@@ -101,3 +101,5 @@ Makefile notes below.
 - recipe (the indented line): the command that builds it
 
 "to make greeting, you need hello.cpp, and here’s the command"
+
+- `make` only rebuilds a target if one of its prerequisites is newer than it
