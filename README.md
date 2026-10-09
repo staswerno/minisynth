@@ -19,31 +19,13 @@ build a small synthesizer written in C++ using only the standard library, render
 - the primary program file is `minisynth.cpp`
 - `wav_file.cpp` and `wav_file.h` create the WAV file
 - `tone_generator.cpp` and `tone_generator.h` generate the sound samples
-- an uncommented version of this code is available in `./clean`
 - `/examples` contains code that explains relevant concepts
 
 ## commands
 
 ### run minisynth
 
-`make run`
-
-full command is in Makefile:
-
-`clang++ minisynth.cpp wav_file.cpp tone_generator.cpp -std=c++17 -Wall -Wextra -o minisynth && ./minisynth` 
-
-changes from wavefilegenerator:
-
-- changed `g++` to `clang++` for clarity - on macOS `g++` forwards to Apple clang
-- `-std=c++17` tells the compiler which language version to use when reading the code
-- the `c++17` standard is supported by a wide range of compilers and has required features for project
-- `-Wall` and `-Wextra` enable both common and extra warnings
-
-Makefile notes below. 
-
-### run minisynth (clean)
-
-`clang++ clean/minisynth-clean.cpp -std=c++17 -Wall -Wextra -o clean/minisynth-clean && ./clean/minisynth-clean`
+`make run-minisynth`
 
 ### check generated file size
 
@@ -51,7 +33,11 @@ Makefile notes below.
 
 ### run pass-by-value-vs-reference experiment
 
-`clang++ examples/pass-by-value-vs-reference.cpp -std=c++17 -Wall -Wextra -o examples/pass-by-value-vs-reference && ./examples/pass-by-value-vs-reference`
+`make run-pass-by-value-vs-reference`
+
+### clean output files
+
+`make clean`
 
 ## notes
 
@@ -93,15 +79,14 @@ Makefile notes below.
 
 ### Makefile
 
-```
+```make
 greeting: hello.cpp
 	clang++ hello.cpp -o greeting
 ```
 
-- target (greeting): the file this rule produces
-- prerequisites (hello.cpp): the files the target is built from
-- recipe (the indented line): the command that builds it
+"to make `greeting`, you need `hello.cpp`, and here's the command"
 
-"to make greeting, you need hello.cpp, and here’s the command"
-
-- `make` only rebuilds a target if one of its prerequisites is newer than it
+- **target** (`greeting`): usually the file the recipe creates; for a `.PHONY` target, just a name for an action
+- **prerequisites** (`hello.cpp`): the files the target depends on; the recipe only runs if the target is missing or a prerequisite is newer than it
+- **recipe** (the indented line): the command that creates the target; must be indented with a tab, not spaces
+- `make` builds the first target in the file; `make <target>` builds a specific one
