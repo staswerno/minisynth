@@ -7,7 +7,7 @@
 // program starts here
 // main holds our "choices" (frequency, amplitude etc)
 // runs the functions (passing values between them) necessary for the desired result of the program
-int main() {
+int main(int argc, char* argv[]) {
     float durationSeconds = 3; //seconds
     int frequency = 528; // Hz
     int amplitude = 10000; // peak amplitude, must stay within int16_t range (±32767)

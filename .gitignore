@@ -1,7 +1,7 @@
 # compiled binaries
 /minisynth
-/pass-by-value-vs-reference
-/clean/minisynth-clean
+/examples/pass-by-value-vs-reference
+/examples/command-line-arguments
 *.o
 *.dSYM/
 

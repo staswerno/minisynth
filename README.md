@@ -35,6 +35,10 @@ build a small synthesizer written in C++ using only the standard library, render
 
 `make run-pass-by-value-vs-reference`
 
+### run command-line-arguments
+
+`make examples/command-line-arguments && ./examples/command-line-arguments hello 440 2.5`
+
 ### clean output files
 
 `make clean`
