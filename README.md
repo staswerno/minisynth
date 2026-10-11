@@ -25,7 +25,23 @@ build a small synthesizer written in C++ using only the standard library, render
 
 ### run minisynth
 
-`make run-minisynth`
+`make run-minisynth ARGS="-f 440 -d 2.5 -o a440.wav"`
+
+#### usage
+
+`minisynth [-f|--frequency HZ] [-d|--duration SECONDS] [-o|--output PATH]`
+
+#### options
+
+all options are optional; any you leave out use their default. options can be given in any order.
+
+- `-f`, `--frequency`: tone frequency in Hz, from 1 to 20000 (_TO DO_), decimals allowed (default: 528)
+- `-d`, `--duration`: length in seconds, from 0.5 to 60 (_TO DO_), decimals allowed (default: 3)
+- `-o`, `--output`: output file path, must either have no extension or end in `.wav` (any capitalisation) (_TO DO_) (default: `tone.wav`)
+
+#### errors (TO DO)
+
+if an option or value isn't valid, minisynth prints an error and the usage line, and exits without writing a file.
 
 ### check generated file size
 
@@ -94,3 +110,16 @@ greeting: hello.cpp
 - **prerequisites** (`hello.cpp`): the files the target depends on; the recipe only runs if the target is missing or a prerequisite is newer than it
 - **recipe** (the indented line): the command that creates the target; must be indented with a tab, not spaces
 - `make` builds the first target in the file; `make <target>` builds a specific one
+
+### error messages reference
+
+- unknown option: --volume
+- missing value for --frequency
+- value without an option: 440
+- --frequency given more than once
+- invalid frequency: banana
+- frequency must be between 1 and 20000 Hz: 25000
+- invalid duration: abc
+- duration must be between 0.5 and 60 seconds: 90
+- output path cannot be empty
+- output path must end in .wav or have no extension: tone.mp3

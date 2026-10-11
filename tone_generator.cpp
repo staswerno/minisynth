@@ -2,7 +2,7 @@
 #include "tone_generator.h"
 
 // calculates the sample values of a sine tone
-std::vector<int16_t> generateTone(float durationSeconds, uint32_t sampleRate, int frequency, int amplitude) {
+std::vector<int16_t> generateTone(float durationSeconds, uint32_t sampleRate, float frequency, int amplitude) {
 
     const double PI = 3.14159265358979323846;
 

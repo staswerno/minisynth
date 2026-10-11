@@ -12,8 +12,9 @@ minisynth: minisynth.cpp wav_file.cpp wav_file.h tone_generator.cpp tone_generat
 # `-Wall` and `-Wextra` enable both common and extra warnings
 
 # a target can be another target's prerequisite: `make run-minisynth` builds `minisynth` first if needed
+# NAME=value after make sets a variable; the recipe uses it as $(NAME), e.g. make run-minisynth ARGS="-f 440"
 run-minisynth: minisynth
-	./minisynth
+	./minisynth $(ARGS) 
 
 examples/pass-by-value-vs-reference: examples/pass-by-value-vs-reference.cpp
 	clang++ examples/pass-by-value-vs-reference.cpp -std=c++17 -Wall -Wextra -o examples/pass-by-value-vs-reference
