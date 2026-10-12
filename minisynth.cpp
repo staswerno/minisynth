@@ -5,9 +5,14 @@
 #include "wav_file.h"
 #include "tone_generator.h"
 
+void printUsage() {
+    std::cerr << "correct usage: minisynth [-f|--frequency HZ] [-d|--duration SECONDS] [-o|--output PATH]\n";
+}
+
+
 // program starts here
 // main holds our default "choices" (frequency, amplitude etc)
-// runs the functions (passing values between them) necessary for the desired result of the program
+// runs the functions (passing values between them) necessary for the desired result of the program 
 int main(int argc, char* argv[]) {
     float durationSeconds = 3; //seconds
     float frequency = 528; // Hz
@@ -21,22 +26,52 @@ int main(int argc, char* argv[]) {
         std::string argument = argv[i];
 
         if (argument == "-f" || argument == "--frequency") {
-            std::string frequencyValue = argv[i + 1]; 
-            frequency = std::stof(frequencyValue);
-            i++;
+            // i + 1 < argc is true only if there is a next argument
+            if (i+1 < argc && argv[i + 1][0] != '-') {
+                std::string frequencyValue = argv[i + 1]; 
+                frequency = std::stof(frequencyValue);
+                i++;
+            }
+            else {
+                std::cerr << "missing value for " << argument << "\n"; // always use cerr for error messages so errors go to error stream
+                printUsage();
+                return 1; // exit the program with an error code. nothing more runs, so nothing is written
+            }
         } 
         else if (argument == "-d" || argument == "--duration") {
-            std::string durationValue = argv[i + 1]; 
-            durationSeconds = std::stof(durationValue);
-            i++;
+            if (i+1 < argc && argv[i + 1][0] != '-') {
+                std::string durationValue = argv[i + 1]; 
+                durationSeconds = std::stof(durationValue);
+                i++;
+            }
+            else {
+                std::cerr << "missing value for " << argument << "\n";
+                printUsage();
+                return 1;
+            }
         } 
         else if (argument == "-o" || argument == "--output") {
-            std::string outputValue = argv[i + 1]; 
-            outputPath = outputValue;
-            i++;
+            if (i+1 < argc && argv[i + 1][0] != '-') {
+                std::string outputValue = argv[i + 1]; 
+                outputPath = outputValue;
+                i++;
+            }
+            else {
+                std::cerr << "missing value for " << argument << "\n";
+                printUsage();
+                return 1;
+            }
         } 
         else {
-            std::cout << "invalid option" << "\n";
+            if (argument[0] == '-') {
+                std::cerr << "unknown option: " << argument << "\n";
+            }
+            else {
+                std::cerr << "value without an option: " << argument << "\n";
+            }
+            printUsage();
+            return 1;
+            
         }
     }
 
