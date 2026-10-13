@@ -35,11 +35,11 @@ build a small synthesizer written in C++ using only the standard library, render
 
 all options are optional; any you leave out use their default. options can be given in any order.
 
-- `-f`, `--frequency`: tone frequency in Hz, from 1 to 20000 (_TO DO_), decimals allowed (default: 528)
-- `-d`, `--duration`: length in seconds, from 0.5 to 60 (_TO DO_), decimals allowed (default: 3)
-- `-o`, `--output`: output file path, must either have no extension or end in `.wav` (any capitalisation) (_TO DO_) (default: `tone.wav`)
+- `-f`, `--frequency`: tone frequency in Hz, from 1 to 20000 (_implementation in progress_), decimals allowed (default: 528)
+- `-d`, `--duration`: length in seconds, from 0.5 to 60 (_implementation in progress_), decimals allowed (default: 3)
+- `-o`, `--output`: output file path, must either have no extension or end in `.wav` (any capitalisation) (_implementation in progress_) (default: `tone.wav`)
 
-#### errors (TO DO)
+#### errors (_implementation in progress_)
 
 if an option or value isn't valid, minisynth prints an error and the usage line, and exits without writing a file.
 
@@ -110,6 +110,15 @@ greeting: hello.cpp
 - **prerequisites** (`hello.cpp`): the files the target depends on; the recipe only runs if the target is missing or a prerequisite is newer than it
 - **recipe** (the indented line): the command that creates the target; must be indented with a tab, not spaces
 - `make` builds the first target in the file; `make <target>` builds a specific one
+
+### why std::stof takes an address
+
+```
+std::size_t charactersRead = 0;
+frequency = std::stof(frequencyValue, &charactersRead);
+```
+
+a function only has one return type, already used for the number (stored in `frequency`) so the count needs to come back another way. using `&charactersRead` writes directly to `charactersRead` rather than copying it (an "output parameter" - function writes to, rather than reads from, it). we use an address rather than a reference because it can also be "nothing" (a null pointer), making the parameter optional. 
 
 ### error messages reference
 

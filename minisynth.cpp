@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include <exception>
 #include "wav_file.h"
 #include "tone_generator.h"
 
@@ -18,18 +19,45 @@ int main(int argc, char* argv[]) {
     float frequency = 528; // Hz
     int amplitude = 10000; // peak amplitude, must stay within int16_t range (±32767)
     std::string outputPath = "tone.wav";
+    // declaring all on one line, e.g. "bool a, b = false;", would leave a uninitialised
+    bool seenFrequency = false;
+    bool seenDuration = false;
+    bool seenOutput = false;
 
+    // read options and check for errors
     for (int i = 1; i < argc; i++) {
         // argv[i] is a char*: a memory address, not the text itself
         // == on two char*s compares addresses, so it's always false for our options
         // a std::string compares contents with ==, so we convert first
         std::string argument = argv[i];
-
+        
         if (argument == "-f" || argument == "--frequency") {
+            // check for duplicates
+            if (seenFrequency) {
+                std::cerr << argument << " given more than once" << "\n";
+                printUsage();
+                return 1;
+            }
             // i + 1 < argc is true only if there is a next argument
-            if (i+1 < argc && argv[i + 1][0] != '-') {
+            else if (i+1 < argc && argv[i + 1][0] != '-') {
                 std::string frequencyValue = argv[i + 1]; 
-                frequency = std::stof(frequencyValue);
+                try {
+                    std::size_t charactersRead = 0; // std::size_t is the standard unsigned type for sizes and counts
+                    frequency = std::stof(frequencyValue, &charactersRead); // see README: "why std::stof takes an address"
+                    if (charactersRead != frequencyValue.size()) {
+                        std::cerr << "invalid frequency: " << frequencyValue << "\n"; 
+                        printUsage();
+                        return 1;
+                    }
+                }
+                // std::exception is the standard library general error type
+                catch (const std::exception&) {
+                    // runs only if stof threw
+                    std::cerr << "invalid frequency: " << frequencyValue << "\n"; 
+                    printUsage();
+                    return 1;
+                }
+                seenFrequency = true;
                 i++;
             }
             else {
@@ -39,9 +67,28 @@ int main(int argc, char* argv[]) {
             }
         } 
         else if (argument == "-d" || argument == "--duration") {
-            if (i+1 < argc && argv[i + 1][0] != '-') {
+            if (seenDuration) {
+                std::cerr << argument << " given more than once" << "\n";
+                printUsage();
+                return 1;
+            }
+            else if (i+1 < argc && argv[i + 1][0] != '-') {
                 std::string durationValue = argv[i + 1]; 
-                durationSeconds = std::stof(durationValue);
+                try {
+                    std::size_t charactersRead = 0;
+                    durationSeconds = std::stof(durationValue, &charactersRead);
+                    if (charactersRead != durationValue.size()) {
+                        std::cerr << "invalid duration: " << durationValue << "\n"; 
+                        printUsage();
+                        return 1;
+                    }
+                }
+                catch (const std::exception&) {
+                    std::cerr << "invalid duration: " << durationValue << "\n"; 
+                    printUsage();
+                    return 1;
+                }
+                seenDuration = true;
                 i++;
             }
             else {
@@ -51,9 +98,15 @@ int main(int argc, char* argv[]) {
             }
         } 
         else if (argument == "-o" || argument == "--output") {
-            if (i+1 < argc && argv[i + 1][0] != '-') {
+            if (seenOutput) {
+                std::cerr << argument << " given more than once" << "\n";
+                printUsage();
+                return 1;
+            }
+            else if (i+1 < argc && argv[i + 1][0] != '-') {
                 std::string outputValue = argv[i + 1]; 
                 outputPath = outputValue;
+                seenOutput = true;
                 i++;
             }
             else {
