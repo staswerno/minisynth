@@ -1,4 +1,5 @@
 #include <cmath>
+
 #include "tone_generator.h"
 
 // calculates the sample values of a sine tone

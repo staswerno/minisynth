@@ -1,6 +1,7 @@
 #include <fstream>
 #include <cstring>
 #include <cstdint>
+
 #include "wav_file.h"
 
 // function definition leads with the return type - in this case the return type is WavHeader

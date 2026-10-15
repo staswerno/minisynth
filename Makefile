@@ -2,8 +2,8 @@
 # .PHONY targets are actions, not files, so their recipes always run
 .PHONY: run-minisynth run-pass-by-value-vs-reference run-command-line-arguments clean
 
-minisynth: minisynth.cpp wav_file.cpp wav_file.h tone_generator.cpp tone_generator.h
-	clang++ minisynth.cpp wav_file.cpp tone_generator.cpp -std=c++17 -Wall -Wextra -o minisynth
+minisynth: minisynth.cpp wav_file.cpp wav_file.h tone_generator.cpp tone_generator.h options.cpp options.h
+	clang++ minisynth.cpp wav_file.cpp tone_generator.cpp options.cpp -std=c++17 -Wall -Wextra -o minisynth
 
 # changes from wavefilegenerator:
 # changed `g++` to `clang++` for clarity - on macOS `g++` forwards to Apple clang
