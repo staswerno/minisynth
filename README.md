@@ -35,13 +35,14 @@ build a small synthesizer written in C++ using only the standard library, render
 
 all options are optional; any you leave out use their default. options can be given in any order.
 
-- `-f`, `--frequency`: tone frequency in Hz, from 1 to 20000 (_implementation in progress_), decimals allowed (default: 528)
-- `-d`, `--duration`: length in seconds, from 0.5 to 60 (_implementation in progress_), decimals allowed (default: 3)
-- `-o`, `--output`: output file path, must either have no extension or end in `.wav` (any capitalisation) (_implementation in progress_) (default: `tone.wav`)
+- `-f`, `--frequency`: tone frequency in Hz, from 1 to 20000, decimals allowed | (default: 528)
+- `-d`, `--duration`: length in seconds, from 0.5 to 60, decimals allowed | (default: 3)
+- `-o`, `--output`: output file path, must either have no extension (`.wav` is added) or end in `.wav` (any capitalisation) | (default: `tone.wav`)
 
-#### errors (_implementation in progress_)
+#### errors
 
-if an option or value isn't valid, minisynth prints an error and the usage line, and exits without writing a file.
+- if an option or value isn't valid, minisynth prints an error and, for option errors, the usage line, and exits without writing a file
+- see error reference at end of README for a full list of checked errors
 
 ### check generated file size
 
@@ -120,6 +121,24 @@ frequency = std::stof(frequencyValue, &charactersRead);
 
 a function only has one return type, already used for the number (stored in `frequency`) so the count needs to come back another way. using `&charactersRead` writes directly to `charactersRead` rather than copying it (an "output parameter" - function writes to, rather than reads from, it). we use an address rather than a reference because it can also be "nothing" (a null pointer), making the parameter optional. 
 
+### the blockAlign issue explained
+
+- *why an odd number of bytes is a problem:* every sample is an `int16_t` which is 2 bytes. so the audio data is always 2 x number of samples, an even number. an odd number of bytes means “some whole samples, plus 1 extra byte”. 1 byte is half a sample, which doesn't exist, so that extra byte doesn't correspond to anything.
+- *the header calculation:* in `wavfilegenerator`'s `createWavHeader` we worked out the number of bytes by `byteRate × duration`. `byteRate` is `2 * sampleRate` (see previous point), so essentially the number of bytes is worked out as `(2 * sampleRate) * duration`. with some decimal durations, this can lead to an odd number of bytes, e.g. `(2 * 44,100) × 1.00002 = 88,201.76`. we chop off the decimal and have an odd number: `88,201`. in `wavfilegenerator` we had a set duration of 3 seconds, so this was not a problem. but in `minisynth` the user can input decimal values for the duration. 
+- *the generateTone calculation:* in `generateTone` the actual sample data is worked out differently: `sample rate x duration`. using the same calculation as above we get `44,100 × 1.00002 = 44,100.88`. _then_ we chop off the decimal, leaving us with `44,100`. how much actual space this takes up will always be this final number x 2, because as we know each sample takes up two bytes, and this will always be an even number. in our example, `2 x 44,100 = 88,200`
+- *the problem:* now the header's audio data value of `88,201` doesn't match the actual audio data of `88,200`. writeFile now writes one byte more than the `samples` vector  created in `generateTone`actually holds, causing a memory bug.
+- *the solution:* we work out the audio data in the `createWavHeader` the same way as we do in `generateTone`, by calculating the number of samples first: `uint32_t numSamples = header.sampleRate * durationSeconds;`then using this number in the subchunk2Size (audio data size) calculation, so `header.subchunk2Size = (header.byteRate) * durationSeconds` becomes `header.blockAlign * numSamples`. 
+
+### object lifecycles and RAII (resource acquisition is initialization)
+
+- `std::ofstream outputStream(...)` creates an *object*: an instance of a standard library class, which bundles data and functions (like `.write()`)
+- a class can have a *constructor*, which runs automatically when the object is created (`std::ofstream`'s opens the file), and a *destructor*, which runs automatically when it's destroyed (`std::ofstream`'s closes the file)
+- an object, like a variable, is destroyed when its scope ends: at the closing brace, or on any `return` out of the function (e.g. our `if (!outputStream)` checks)
+- "destroyed" refers to the `outputStream` object (the variable), not the WAV file on disk, which stays
+- so `outputStream` is always closed when `writeFile` ends, however it ends, and `file.close()` isn't needed (it only exists to close a file earlier than the end of its scope)
+- RAII = tying cleanup to an object's lifetime, so it happens automatically and can't be forgotten
+- `std::vector` and `std::string` work the same way: their destructors free their memory, which is why we never free it ourselves
+
 ### error messages reference
 
 - unknown option: --volume
@@ -132,3 +151,4 @@ a function only has one return type, already used for the number (stored in `fre
 - duration must be between 0.5 and 60 seconds: 90
 - output path cannot be empty
 - output path must end in .wav or have no extension: tone.mp3
+- could not write file: nofolder/440.wav

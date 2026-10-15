@@ -22,4 +22,4 @@ struct WavHeader {
 #pragma pack(pop)
 
 WavHeader createWavHeader(float durationSeconds);
-void writeFile(const WavHeader& header, const std::vector<int16_t>& samples, const std::string& outputPath);
+bool writeFile(const WavHeader& header, const std::vector<int16_t>& samples, const std::string& outputPath);
