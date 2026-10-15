@@ -9,7 +9,7 @@ build a small synthesizer written in C++ using only the standard library, render
 ### checklist
 
 - [x] **WAV file generator:** synthesize a sine wave tone and write it to a 16-bit mono WAV file using only the C++ standard library
-- [x] **CLI tool:** split the code into functions and files, and set frequency, duration and output path via command-line arguments
+- [x] **CLI tool:** split the code into functions and files, and set frequency, duration and output path via command-line arguments. add extensive error checks
 - [ ] **oscillators:** generate sine, square, saw, triangle and noise waveforms using a phase accumulator
 - [ ] **sequencer:** render a sequence of notes passed on the command line, with ADSR envelopes, stereo panning and mixing
 - [ ] **real-time playback (optional):** play the synth live through the speakers using a callback-based audio API
