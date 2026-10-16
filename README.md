@@ -26,7 +26,8 @@ build a small synthesizer written in C++ using only the standard library, render
 
 ### run minisynth
 
-`make run-minisynth ARGS="-f 440 -d 2.5 -o a440.wav"`
+- with defaults: `make run-minisynth`
+- with arguments: `make run-minisynth ARGS="-f 440 -d 2.5 -o a440.wav"`
 
 #### usage
 
