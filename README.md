@@ -147,6 +147,51 @@ a function only has one return type, already used for the number (stored in `fre
 - RAII = tying cleanup to an object's lifetime, so it happens automatically and can't be forgotten
 - `std::vector` and `std::string` work the same way: their destructors free their memory, which is why we never free it ourselves
 
+### phase accumulator explained
+
+- for minisynth, we have refactored the tone generator into a phase accumulator. this allows for smooth pitch transitions and provides us with a single engine that multiple waveform functions can use
+- *phase*: how far through one cycle we are, measured from 0 through 1. for a sine wave, 0.25 is the peak and 0.75 is the trough
+- in _wave file generator_ we are counting every cycle, so 122.25 says we have completed 122 cycles and are at the peak of the current cycle, but the only important information to us is where we are in the current cycle
+- *the original formula*: `phase = frequency × i / sampleRate`
+- `i / sampleRate` is `time` - if there are 44100 samples in a second, and we are at sample (i) 22050, then we are at 0.5 seconds
+- `frequency * time` is how many cycles we have thus far completed, so `440 * 0.5s` is `220` cycles
+- we then turned this position into sound using the formula `sin(2π × phase)`. this says how high the wave is, at the given phase point in the cycle (phase). in this case this bends the previously straight and rising phase line into a curve, creating a sine wave
+- *the phase accumulator: phase increment*: to start, we want to ask ourselves _how many cycles are there in a sample?_ we work this out by dividing the frequency by the sample rate - so if, in theory, the frequency is 2 (2 cycles per second) and the sample rate is 8 (8 samples per second, our "resolution"), then we have `2 / 8 = 0.25` cycles per sample. this number is called our *phase increment*. for every sample, the phase will increment by 0.25, and each time it does increment we want to provide a number that will tell us where we are in the wave
+- *the phase accumulator:* whereas before we were counting every cycle (our example being 122.25), the phase accumulator will only keep the position in the current cycle. it does this by:
+    1. outputting the wave at the current phase
+	2. adding the increment
+	3. subtracting 1 if the phase has reached one or more (it "wraps")
+- we can see the difference using JS code as examples:
+
+ ```javascript
+// A: work it out from the loop index every time
+for (let i = 0; i < 5; i++) {
+  const height = 20 * i;
+  console.log(height);
+}
+
+// B: keep a running total
+let height = 0;
+for (let i = 0; i < 5; i++) {
+  console.log(height);
+  height += 20;
+}
+```
+
+- the new method is better because it prevents a sharp jump in the wave which can lead to clicks. in example A, if you change the step height to 25cm, it calculates as if it had always been 25cm, so you see a large leap in the total height. in example B, the change happens from when the change was made. an example using real audio numbers:
+    - 440 Hz: `440 × 0.25s (sample 11025) = 110.00 cycles`, so the position is 0, and the sample value is 0
+    - At 441 Hz: `441 × 0.25s (sample 11025) = 110.25 cycles`, so the position is 0.25, which is the peak - we jump quickly from 0 to peak, causing a click
+
+![phase accumulator example](phase-accumulator.png)
+
+- two smaller benefits: firstly, because we are always subtracting 1 when we complete a cycle, it means we are always dealing with small numbers, less than 1 in fact. with a large audio file, the number of cycles can balloon to vast numbers. secondly, we now have one engine that all the waveforms can use
+
+### float vs double
+
+- a double has about twice as many digits as a float, making rounding errors smaller
+- in `double phaseIncrement = static_cast<double>(frequency) / static_cast<double>(sampleRate);` we convert the inputs to avoid minor rounding errors, as a calculation’s type is decided by its inputs, not the variable you store it in
+- we only need a cast on one side as C++ converts other side to match, but both have been left in for clarity
+
 ### variable data flow reference
 
 - `durationSeconds`: we are using an existing variable, hence no type declaration
