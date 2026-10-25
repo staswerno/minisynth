@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 // Options holds our default "choices" (frequency, duration etc)
