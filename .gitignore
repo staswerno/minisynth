@@ -7,7 +7,6 @@
 
 # generated audio
 /*.wav
-/tone-reference
 
 # macOS
 .DS_Store

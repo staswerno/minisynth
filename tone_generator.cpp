@@ -1,8 +1,8 @@
 #include "tone_generator.h"
 #include "waveform.h"
 
-// calculates the sample values of a sine tone
-std::vector<int16_t> generateTone(float durationSeconds, uint32_t sampleRate, float frequency, int amplitude) {
+// calculates the sample values of given waveform
+std::vector<int16_t> generateTone(float durationSeconds, uint32_t sampleRate, float frequency, int amplitude, Waveform waveform) {
 
     uint32_t numSamples = sampleRate * durationSeconds;
     std::vector<int16_t> samples(numSamples);
@@ -12,7 +12,7 @@ std::vector<int16_t> generateTone(float durationSeconds, uint32_t sampleRate, fl
 
     // refactored into a phase accumulator. see "phase accumulator explained" in README
     for (uint32_t i = 0; i < numSamples; i++) {
-        samples[i] = static_cast<int16_t>(amplitude * waveformValue(Waveform::Sine, phasePosition));
+        samples[i] = static_cast<int16_t>(amplitude * waveformValue(waveform, phasePosition));
 
         phasePosition += phaseIncrement;
         if (phasePosition >= 1) {

@@ -6,7 +6,7 @@
 #include "options.h"
 
 void printUsage() {
-    std::cerr << "correct usage: minisynth [-f|--frequency HZ] [-d|--duration SECONDS] [-o|--output PATH]\n";
+    std::cerr << "correct usage: minisynth [-f|--frequency HZ] [-d|--duration SECONDS] [-o|--output PATH] [-w|--waveform NAME]\n";
 }
 
 bool parseOptions(int argc, char* argv[], Options& options) {
@@ -14,6 +14,7 @@ bool parseOptions(int argc, char* argv[], Options& options) {
     bool seenFrequency = false;
     bool seenDuration = false;
     bool seenOutput = false;
+    bool seenWaveform = false;
 
     // read options and check for errors
     for (int i = 1; i < argc; i++) {
@@ -115,6 +116,34 @@ bool parseOptions(int argc, char* argv[], Options& options) {
             options.outputPath = outputValue;
             seenOutput = true;
             i++;
+        }
+
+        else if (argument == "-w" || argument == "--waveform") {
+            if (seenWaveform) {
+                std::cerr << argument << " given more than once" << "\n";
+                printUsage();
+                return false;
+            }
+            if (!(i+1 < argc && argv[i + 1][0] != '-')) {
+                std::cerr << "missing value for " << argument << "\n";
+                printUsage();
+                return false;
+            }
+            std::string waveformName = argv[i + 1]; 
+            std::string waveformLowered = waveformName;
+            for (char& c : waveformLowered) {
+                c = std::tolower(c);
+            }
+            if (waveformLowered == "sine") {
+                options.waveform = Waveform::Sine;
+                seenWaveform = true;
+                i++;
+            }
+            else {
+                std::cerr << "unknown waveform: " << waveformName << "\n";
+                printUsage();
+                return false;
+            }
         }
 
         else {

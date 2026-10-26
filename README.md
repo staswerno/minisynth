@@ -27,11 +27,11 @@ build a small synthesizer written in C++ using only the standard library, render
 ### run minisynth
 
 - with defaults: `make run-minisynth`
-- with arguments: `make run-minisynth ARGS="-f 440 -d 2.5 -o a440.wav"`
+- with arguments: `make run-minisynth ARGS="-f 440 -d 2.5 -o a440.wav -w sine"`
 
 #### usage
 
-`minisynth [-f|--frequency HZ] [-d|--duration SECONDS] [-o|--output PATH]`
+`minisynth [-f|--frequency HZ] [-d|--duration SECONDS] [-o|--output PATH] [-w|--waveform NAME]`
 
 #### options
 
@@ -40,6 +40,7 @@ all options are optional; any you leave out use their default. options can be gi
 - `-f`, `--frequency`: tone frequency in Hz, from 1 to 20000, decimals allowed | (default: 528)
 - `-d`, `--duration`: length in seconds, from 0.5 to 60, decimals allowed | (default: 3)
 - `-o`, `--output`: output file path, must either have no extension (`.wav` is added) or end in `.wav` (any capitalisation) | (default: `tone.wav`)
+- `-w`, `--waveform`: waveform, currently only sine (any capitalisation). more waveforms coming in stage 3 | (default: sine)
 
 #### errors
 
@@ -223,6 +224,7 @@ for (let i = 0; i < 5; i++) {
 - output path cannot be empty
 - output path must end in .wav or have no extension: tone.mp3
 - could not write file: nofolder/440.wav
+- unknown waveform: banjo
 
 ### tests
 

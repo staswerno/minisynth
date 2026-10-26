@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 
     // durationSeconds: see README for example data flow
     WavHeader header = createWavHeader(options.durationSeconds);
-    std::vector<int16_t> samples = generateTone(options.durationSeconds, header.sampleRate, options.frequency, amplitude);
+    std::vector<int16_t> samples = generateTone(options.durationSeconds, header.sampleRate, options.frequency, amplitude, options.waveform);
     bool fileWritten = writeFile(header, samples, options.outputPath);
 
     // check output file
