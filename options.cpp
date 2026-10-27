@@ -136,19 +136,20 @@ bool parseOptions(int argc, char* argv[], Options& options) {
             }
             if (waveformLowered == "sine") {
                 options.waveform = Waveform::Sine;
-                seenWaveform = true;
-                i++;
             }
-            if (waveformLowered == "saw") {
+            else if (waveformLowered == "saw") {
                 options.waveform = Waveform::Saw;
-                seenWaveform = true;
-                i++;
+            }
+            else if (waveformLowered == "square") {
+                options.waveform = Waveform::Square;
             }
             else {
                 std::cerr << "unknown waveform: " << waveformName << "\n";
                 printUsage();
                 return false;
             }
+            seenWaveform = true;
+            i++;
         }
 
         else {

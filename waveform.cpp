@@ -10,6 +10,11 @@ double waveformValue(Waveform waveform, double phasePosition) {
             return sin(2 * PI * phasePosition); // sine wave formula
         case Waveform::Saw:
             return -1 + (1 - -1) * phasePosition; // saw wave formula
+        case Waveform::Square:
+            if (phasePosition < 0.5) {
+                return 1.0;
+            }
+            return -1.0; // square wave formula
     }
     return 0.0;
 }
