@@ -139,6 +139,11 @@ bool parseOptions(int argc, char* argv[], Options& options) {
                 seenWaveform = true;
                 i++;
             }
+            if (waveformLowered == "saw") {
+                options.waveform = Waveform::Saw;
+                seenWaveform = true;
+                i++;
+            }
             else {
                 std::cerr << "unknown waveform: " << waveformName << "\n";
                 printUsage();
