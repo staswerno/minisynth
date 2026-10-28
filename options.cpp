@@ -143,6 +143,9 @@ bool parseOptions(int argc, char* argv[], Options& options) {
             else if (waveformLowered == "square") {
                 options.waveform = Waveform::Square;
             }
+            else if (waveformLowered == "triangle") {
+                options.waveform = Waveform::Triangle;
+            }
             else {
                 std::cerr << "unknown waveform: " << waveformName << "\n";
                 printUsage();
