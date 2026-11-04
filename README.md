@@ -49,6 +49,23 @@ all options are optional; any you leave out use their default. options can be gi
 - if an option or value isn't valid, minisynth prints an error and, for option errors, the usage line, and exits without writing a file
 - see error reference at end of README for a full list of checked errors
 
+### testing
+
+`make test`
+
+- builds minisynth and runs all automated tests (all should pass)
+- for a full list of test cases see `run-tests.sh`
+
+#### special test cases
+
+- **empty output** (test manually, as bash can't pass an empty argument through an unquoted `$1`)
+  - run: `make run-minisynth ARGS='-o ""'`
+  - expected: `output path cannot be empty`
+- **blockAlign** (test manually)
+  - run: `make run-minisynth ARGS="-d 1.00002"`, then `ls -la tone.wav`
+  - expected: 88244 bytes
+
+
 ### check generated file size
 
 `ls -la tone.wav`
@@ -258,84 +275,6 @@ if (i == 10 || i == 30 || i == 60 || i == 90) {
 - output path must end in .wav or have no extension: tone.mp3
 - could not write file: nofolder/440.wav
 - unknown waveform: banjo
-
-### tests
-
-run each with `make run-minisynth ARGS="..."` (the first one with no ARGS). every error except "could not write file" also prints the usage line. no error writes a file.
-
-**key test cases**
-
-| checks | ARGS | expected output |
-|---|---|---|
-| defaults | *(none)* | `wrote tone.wav` |
-| all options | `-f 440.5 -d 2.5 -o a440 -w square` | `wrote a440.wav` |
-| missing value | `-f -d 2.5` | `missing value for -f` |
-| unknown option | `--volume 5` | `unknown option: --volume` |
-| value without option | `440` | `value without an option: 440` |
-| duplicate | `-f 440 --frequency 880` | `--frequency given more than once` |
-| invalid number | `-f 440abc` | `invalid frequency: 440abc` |
-| negative value | `-d -5` | `duration must be between 0.5 and 60 seconds: -5` |
-| bad extension | `-o tone.mp3` | `output path must end in .wav or have no extension: tone.mp3` |
-| write failure | `-o nofolder/tone` | `could not write file: nofolder/tone.wav` |
-| unknown waveform | `-w banjo` | `unknown waveform: banjo` |
-
-**all test cases**
-
-| area | ARGS | expected output |
-|---|---|---|
-| defaults | *(none)* | `wrote tone.wav` |
-| all options | `-f 440 -d 2.5 -o a440` | `wrote a440.wav` |
-| long forms | `--frequency 440 --duration 2 --output a440.wav` | `wrote a440.wav` |
-| any order | `-o a440 -d 2 -f 440` | `wrote a440.wav` |
-| structure | `-f` | `missing value for -f` |
-| structure | `-f -d 2.5` | `missing value for -f` |
-| structure | `--volume 5` | `unknown option: --volume` |
-| structure | `440` | `value without an option: 440` |
-| structure | `-f 440 300` | `value without an option: 300` |
-| duplicates | `-f 440 -f 880` | `-f given more than once` |
-| duplicates | `-f 440 --frequency 880` | `--frequency given more than once` |
-| duplicates | `-d 1 -o a.wav -d 2` | `-d given more than once` |
-| duplicates | `-o x.wav --output y.wav` | `--output given more than once` |
-| frequency | `-f 440.5` | `wrote tone.wav` |
-| frequency | `-f 1` | `wrote tone.wav` (lowest allowed) |
-| frequency | `-f 20000` | `wrote tone.wav` (highest allowed) |
-| frequency | `-f banana` | `invalid frequency: banana` |
-| frequency | `-f 440abc` | `invalid frequency: 440abc` |
-| frequency | `-f 1e999` | `invalid frequency: 1e999` (too big for a float) |
-| frequency | `-f 0.5` | `frequency must be between 1 and 20000 Hz: 0.5` |
-| frequency | `-f 25000` | `frequency must be between 1 and 20000 Hz: 25000` |
-| frequency | `-f -5` | `frequency must be between 1 and 20000 Hz: -5` |
-| frequency | `-f nan` | `frequency must be between 1 and 20000 Hz: nan` |
-| frequency | `-f inf` | `frequency must be between 1 and 20000 Hz: inf` |
-| duration | `-d 0.5` | `wrote tone.wav` (lowest allowed) |
-| duration | `-d 60` | `wrote tone.wav` (highest allowed) |
-| duration | `-d abc` | `invalid duration: abc` |
-| duration | `-d 0.2` | `duration must be between 0.5 and 60 seconds: 0.2` |
-| duration | `-d 90` | `duration must be between 0.5 and 60 seconds: 90` |
-| duration | `-d -5` | `duration must be between 0.5 and 60 seconds: -5` |
-| blockAlign | `-d 1.00002` | `wrote tone.wav`, and `ls -la tone.wav` shows 88244 bytes |
-| output | `-o a440` | `wrote a440.wav` |
-| output | `-o a440.wav` | `wrote a440.wav` |
-| output | `-o a440.WAV` | `wrote a440.WAV` |
-| output | `-o ./tone` | `wrote ./tone.wav` |
-| output | `-o` | `missing value for -o` |
-| output | `-o tone.mp3` | `output path must end in .wav or have no extension: tone.mp3` |
-| output | `-o my.song` | `output path must end in .wav or have no extension: my.song` |
-| output | `-o ""` (use `ARGS='-o ""'`) | `output path cannot be empty` |
-| writing | `-o nofolder/tone` | `could not write file: nofolder/tone.wav` |
-| waveform | `-w sine` | `wrote tone.wav` |
-| waveform | `-w saw` | `wrote tone.wav` |
-| waveform | `-w square` | `wrote tone.wav` |
-| waveform | `-w triangle` | `wrote tone.wav` |
-| waveform | `-w noise` | `wrote tone.wav` |
-| waveform | `--waveform saw` | `wrote tone.wav` |
-| waveform | `-w SQUARE` | `wrote tone.wav` |
-| waveform | `-w banjo` | `unknown waveform: banjo` |
-| waveform | `-w Banjo` | `unknown waveform: Banjo` |
-| structure | `-w` | `missing value for -w` |
-| duplicates | `-w sine --waveform sine` | `--waveform given more than once` |
-| any order | `-o a440 -w sine` | `wrote a440.wav` |
-| any order | `-w sine -o a440` | `wrote a440.wav` |
 
 ### known limitations
 

@@ -1,6 +1,6 @@
 # a target is normally a file: its recipe only runs if the file is missing or older than a prerequisite (see README)
 # .PHONY targets are actions, not files, so their recipes always run
-.PHONY: run-minisynth run-pass-by-value-vs-reference run-command-line-arguments clean
+.PHONY: run-minisynth run-pass-by-value-vs-reference run-command-line-arguments clean test
 
 minisynth: minisynth.cpp wav_file.cpp wav_file.h tone_generator.cpp tone_generator.h options.cpp options.h waveform.cpp waveform.h
 	clang++ minisynth.cpp wav_file.cpp tone_generator.cpp options.cpp waveform.cpp -std=c++17 -Wall -Wextra -o minisynth
@@ -31,3 +31,5 @@ run-command-line-arguments: examples/command-line-arguments
 clean:
 	rm -f minisynth examples/pass-by-value-vs-reference examples/command-line-arguments *.wav
 
+test: minisynth
+	bash ./run-tests.sh
